@@ -32,7 +32,7 @@ async fn main() {
         },
         "SET" => Request {
             key: Some(FastStr::from(Arc::new(args.remove(2)))),
-            value: Some(FastStr::from(Arc::new(args.remove(3)))),
+            value: Some(FastStr::from(Arc::new(args.remove(2)))),
             request_type: RequestType::Set,
             ttl: None,
         },
@@ -65,20 +65,20 @@ async fn main() {
         _ => {
             println!(
                 "USAGE:
-                      mini-redis-cli [OPTIONS] <SUBCOMMAND>
+mini-redis-cli [OPTIONS] <SUBCOMMAND>
 
-                  FLAGS:
-                      -h, --help       Prints help information
-                      -V, --version    Prints version information
+FLAGS:
+-h, --help       Prints help information
+-V, --version    Prints version information
 
-                  OPTIONS:
-                          --host <hostname>     [default: 127.0.0.1]
-                          --port <port>         [default: 6379]
+OPTIONS:
+  --host <hostname>     [default: 127.0.0.1]
+  --port <port>         [default: 6379]
 
-                  SUBCOMMANDS:
-                      get     Get the value of key
-                      help    Prints this message or the help of the given subcommand(s)
-                      set     Set key to hold the string value"
+SUBCOMMANDS:
+get     Get the value of key
+help    Prints this message or the help of the given subcommand(s)
+set     Set key to hold the string value"
             );
             return;
         }

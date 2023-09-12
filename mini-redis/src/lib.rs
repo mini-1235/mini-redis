@@ -4,8 +4,10 @@ use bytes::Bytes;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use volo_gen::mini::redis::*;
+use tracing::info;
+use volo::FastStr;
 pub struct S {
-    pub db: Mutex<HashMap<String, Bytes>>,
+    pub db: Mutex<HashMap<String, String>>,
 }
 pub struct Channel {
     pub db: Mutex<HashMap<String, Bytes>>,
@@ -19,20 +21,38 @@ impl volo_gen::mini::redis::ItemService for S {
     ) -> ::core::result::Result<Response, ::volo_thrift::AnyhowError> {
         match req.request_type {
             RequestType::Get => {
-                let key = req.key.unwrap().into_string();
-                let db = self.db.lock().unwrap();
-                let value = db.get(&key).unwrap();
-                Ok(Response {
-                    message: Some("ok".into()),
-                    response_type: ResponseType::Ok,
-                })
+								info!("get");
+                // let key = req.key.unwrap().into_string();
+                // let db = self.db.lock().unwrap();
+								
+                // let value = db.get(&key).unwrap();
+                // self.db.lock().unwrap().get(&req.key.unwrap().into_string());
+                // Ok(Response {
+                //     message: Some("ok".into()),
+                //     response_type: ResponseType::Ok,
+                // })
+                match self.db.lock().unwrap().get(&req.key.unwrap().into_string()) {
+                    Some(value) => Ok(Response {
+                        message: Some(FastStr::from(value.clone())),
+                        response_type: ResponseType::Message,
+                    }),
+                    None => Ok(Response {
+                        message: Some("not found".into()),
+                        response_type: ResponseType::Message,
+                    }),
+                }
             }
             RequestType::Set => {
-                let key = req.key.unwrap().into_string();
-                // let value = req.value;
-                let value = req.value.unwrap().into_bytes();
-                let mut db = self.db.lock().unwrap();
-                db.insert(key, value);
+                // let key = req.key.unwrap().into_string();
+                // // let value = req.value;
+                // let value = req.value.unwrap().into_bytes();
+                // let mut db = self.db.lock().unwrap();
+                // db.insert(key, value);
+                self.db.lock().unwrap().insert(
+                    req.key.unwrap().into_string(),
+                    // req.value.unwrap().into_bytes(),
+                    req.value.unwrap().into_string(),
+                );
                 Ok(Response {
                     message: Some("ok".into()),
                     response_type: ResponseType::Ok,
